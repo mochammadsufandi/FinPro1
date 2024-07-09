@@ -13,5 +13,122 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(255)
+  email String  @db.VarChar(255) @unique 
+  password String 
+  address String
+  role String @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  order Order[]
+  product_movement Product_Movement[]
+}
+
+model Warehouse {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(255) @unique
+  location String @db.VarChar(255) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  inventory Inventory[]
+  product_movement Product_Movement[]
+}
+
+model Master_Product {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(255)
+  image String? 
+  sku String?
+  price Int
+  stock Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  categoryId Int
+  category Category @relation(fields : [categoryId], references : [id])
+  order_product Order_Product[]
+  product_batch Product_Batch[]
+  inventory Inventory[]
+  product_movement Product_Movement[]
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String @db.VarChar(255) @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  master_product Master_Product[]
+}
+
+model Inventory {
+  id Int @id @default(autoincrement())
+  stock Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  masterProductId Int
+  master_product Master_Product @relation(fields : [masterProductId], references : [id])
+  warehouseId Int
+  warehouse Warehouse @relation(fields : [warehouseId], references : [id])
+}
+
+model Product_Movement {
+  id Int @id @default(autoincrement())
+  movement_type String @db.VarChar(255)
+  quantity Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  orderId Int?
+  order Order? @relation(fields : [orderId], references : [id])
+  warehouseId Int
+  warehouse Warehouse @relation(fields : [warehouseId], references : [id])
+  userId Int
+  user User @relation(fields : [userId], references : [id], map : "product_movement_user_id_fkey")
+  masterProductId Int
+  master_product Master_Product @relation(fields : [userId], references : [id], map: "product_movement_masterproduct_id_fkey")
+}
+
+model Product_Batch {
+  id Int @id @default(autoincrement())
+  quantity Int
+  expirationDate DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  masterProductId Int
+  master_product Master_Product @relation(fields : [masterProductId], references : [id])
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  paymentType String? @db.VarChar(255)
+  status String? @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userId Int
+  user User @relation(fields : [userId], references : [id])
+  order_product Order_Product[]
+  complaint Complaint?
+  product_movement Product_Movement[]
+}
+
+model Complaint {
+  id Int @id @default(autoincrement())
+  text String
+  status String? @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  orderId Int @unique
+  order Order @relation(fields : [orderId], references : [id])
+}
+
+model Order_Product {
+  id Int @id @default(autoincrement())
+  orderId Int
+  order Order @relation(fields : [orderId], references : [id])
+  masterProductId Int
+  master_product Master_Product @relation(fields : [masterProductId], references : [id])
+}
+
+
 
 
