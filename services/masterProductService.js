@@ -1,3 +1,6 @@
+const {PrismaClient} = require('@prisma/client');
+const prisma = new PrismaClient();
+
 const { 
     getAllRepository,
     getByIdRepository, 
@@ -7,29 +10,43 @@ const {
 } = require("../repositories/masterProductRepository");
 
 const getAllService = async(params) => {
-    const dummyVar = 'Hello World';
-    await getAllRepository(dummyVar);
-    console.log(params);
+    const products = await getAllRepository(params);
+    return products;
 }
 
 const getByIdService = async(params) => {
-    await getByIdRepository(params);
-    console.log(params);
+    const product = await getByIdRepository(params);
+    if(!product) throw({name : 'No Product'});
+    return product;
 }
 
 const addService = async(params) => {
-    await addRepository(params)
-    console.log(params);
+    const {categoryId} = params;
+    const category = await prisma.category.findUnique({
+        where : {
+            id : +categoryId
+        }
+    })
+    if(!category) throw({name : 'No Category'})
+    const product = await addRepository(params);
+    return product;
 }
 
 const editService = async(params) => {
-    await editRepository(params);
-    console.log(params);
+    const {id} = params;
+    const existingProduct = await prisma.master_Product.findUnique({
+        where : {
+            id : +id
+        }
+    })
+    if(!existingProduct) throw({name : 'No Product'});
+    const updateProduct = await editRepository(params);
+    return updateProduct;
 }
 
 const deleteService = async(params) => {
-    await deleteRepository(params);
-    console.log(params);
+    const deleteProduct = await deleteRepository(params);
+    return deleteProduct;
 }
 
 

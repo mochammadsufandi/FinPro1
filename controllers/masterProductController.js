@@ -10,8 +10,12 @@ class masterProduct {
     // view master product
     static async getAllMasterProduct (req,res,next) {
         try {
-            await getAllService('OI');
-            return res.status(200).json({message : 'MASUKKK'});
+            const {page, limit} = req.query;
+            const products = await getAllService({page,limit});
+            return res.status(200).json({
+                message : 'Berhasil Reload All Master Products',
+                data : products
+            });
         } catch(err) {
             console.log(err);
             next(err);
@@ -21,8 +25,11 @@ class masterProduct {
     static async getMasterProductById (req,res,next) {
         try {
             const{id} = req.params;
-            await getByIdService({id});
-            return res.status(200).json({message : 'Masukk Master Product By Id'});
+            const product = await getByIdService(id);
+            return res.status(200).json({
+                message : 'Masukk Master Product By Id',
+                data : product
+            });
         } catch(err) {
             console.log(err);
             next(err);
@@ -31,9 +38,12 @@ class masterProduct {
     // add master product => {name,category}
     static async addMasterProduct (req,res,next) {
         try {
-            const {name,category} = req.body;
-            await addService({name,category});
-            return res.status(201).json({message : 'BERHASIL menambahkan master product'});
+            const {name,price,categoryId} = req.body;
+            const product = await addService({name,price,categoryId})
+            return res.status(201).json({
+                message : 'BERHASIL menambahkan master product',
+                data : product
+            });
         } catch(err) {
             console.log(err);
             next(err);
@@ -43,9 +53,12 @@ class masterProduct {
     static async editMasterProduct (req,res,next) {
         try {
             const {id} = req.params;
-            const {name, category} = req.body;
-            await editService({id, name, category});
-            return res.status(200).json({message : 'Berhasil Edit Master Product'});
+            const {name, price, categoryId} = req.body;
+            const updateProduct = await editService({id, name, price, categoryId});
+            return res.status(200).json({
+                message : 'Berhasil Edit Master Product',
+                data : updateProduct
+            });
         } catch(err) {
             console.log(err);
             next(err);
@@ -55,8 +68,11 @@ class masterProduct {
     static async deleteMasterProduct (req,res,next) {
         try {
             const{id} = req.params;
-            await deleteService({id});
-            return res.status(200).json({message : 'Berhasil Delete Master Product'});
+            const deleteProduct = await deleteService(id);
+            return res.status(200).json({
+                message : 'Berhasil Delete Master Product',
+                data : deleteProduct
+            });
         } catch(err) {
             console.log(err);
             next(err);
